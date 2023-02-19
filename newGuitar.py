@@ -214,19 +214,21 @@ def main():
 
             # DrawBoardLog(draw)
 
-            thumb_x = point["Thumb Tip"].x
-            thumb_y = point["Thumb Tip"].y
+            thumb_x = int(point["Thumb Tip"].x * 640)
+            thumb_y = int(point["Thumb Tip"].y * 480)
             # x1 = draw[0][0][0]
             # y1 = draw[0][0][1]
             # x2 = draw[0][1][0]
             # y2 = draw[0][1][1]
-            # x1 = point["Wrist"].x
-            # y1 = point["Wrist"].y
-            x1 = 0
-            y1 = 0
-            FingerLog(point,"Wrist")
+
+            x1 = point["Wrist"].x
+            y1 = point["Wrist"].y
+
+            x1 = int(x1*640)
+            y1 = int(y1*480)
             x2 = 600
-            y2 = 400
+            y2 = 20
+
             cv2.line(image,(x1,y1),(x2,y2),(0,0,255),2)
             # cv2.line(image, (int(x1) * 640, int(y1) * 480), (int(x2) * 640, int(y2) * 480), (0, 0, 255), 2)
             if abs((y2 - y1) * thumb_x - (x2 - x1) * thumb_y + x2 * y1 - y2 * x1) / ((y2 - y1) ** 2 + (x2 - x1) ** 2) <= 0.1:
