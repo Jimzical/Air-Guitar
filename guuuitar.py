@@ -114,22 +114,19 @@ def DrawLine(image,point1,point2,length = 3 ,xoffset = 0, yoffset = 0 ,Lncolor =
         endpoint = point2
     cv2.line(image, startpoint, endpoint, Lncolor, 5)
     return startpoint, endpoint
-def DrawBoard(image, point , lines = 4, xoffset = 10, yoffset = 10, offset = 0,dynamic = False,log = False):
+def DrawBoard(image, basepoint , fretpoint , lines = 4, xoffset = 10, yoffset = 10, offset = 0,dynamic = False):
     # Draw the board
     if dynamic:
-        # VERY BUGGY
-        xoffset = int(abs(point["Middle MCP"].z * 500 ))
-        yoffset = int(abs(point["Middle MCP"].z * 500 ))
+        xoffset = abs(basepoint.z) * 100
+        yoffset = abs(basepoint.z) * 100
     if offset > 0:
         xoffset = offset
         yoffset = offset
-    if log:
-        print("Xoffset: {} Yoffset: {}".format(xoffset,yoffset))
 
     col = rainbow_gradient(lines)
     posList = []
     for stringLine in range(lines):
-        posList.append(DrawLine(image, point["Wrist"], point["Middle MCP"], length=4, xoffset=stringLine * xoffset, yoffset= stringLine * yoffset, Lncolor=col[stringLine]))
+        posList.append(DrawLine(image, basepoint, fretpoint, length=4, xoffset=stringLine * xoffset, yoffset= stringLine * yoffset, Lncolor=col[stringLine]))
     return posList
 def ContactCheck(img,draw, finger,log = False, accuracy = 10):
     thumb_x = int(finger.x * 640)
@@ -180,8 +177,8 @@ def main():
                                                 "Pinky PIP" : results.multi_hand_landmarks[0].landmark[18], "Pinky DIP" : results.multi_hand_landmarks[0].landmark[19], \
                                                     "Pinky Tip" : results.multi_hand_landmarks[0].landmark[20]}
             markHands(image, results, point,mp_drawing,mp_drawing_styles,mp_hands)
-            draw = DrawBoard(image, point ,lines=3,dynamic=False, log = True)
-            ContactCheck(image,draw, point["Thumb Tip"],log = False, accuracy = 5)
+            draw = DrawBoard(image, basepoint=point["Wrist"] , fretpoint= point["Middle MCP"] ,lines=3,dynamic=True)
+            ContactCheck(image,draw, point["Thumb Tip"],log = True, accuracy = 5)
         showImage(image)
         endCode(cap)
 if __name__ == "__main__":
