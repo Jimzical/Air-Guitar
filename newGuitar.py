@@ -142,27 +142,44 @@ def DrawBoard(image, point , lines = 4, xoffset = 10, yoffset = 10):
     posList = []
     for stringLine in range(lines):
         # DrawLine(image, point["Wrist"], point["Middle MCP"], length=4, xoffset=stringLine * xoffset, yoffset= stringLine * yoffset, Lncolor=col[stringLine])
-        # posList.append(DrawLine(image, point["Wrist"], point["Middle MCP"], length=4, xoffset=stringLine * xoffset, yoffset= stringLine * yoffset, Lncolor=col[stringLine]))
-        posList.append(DrawLine(image, point["Wrist"], (500,0), length=4, xoffset=stringLine * xoffset, yoffset= stringLine * yoffset, Lncolor=col[stringLine],OneHand=True))
+        posList.append(DrawLine(image, point["Wrist"], point["Middle MCP"], length=4, xoffset=stringLine * xoffset, yoffset= stringLine * yoffset, Lncolor=col[stringLine]))
+        # posList.append(DrawLine(image, point["Wrist"], (500,0), length=4, xoffset=stringLine * xoffset, yoffset= stringLine * yoffset, Lncolor=col[stringLine],OneHand=True))
         
     return posList
 
-def ContactCheck(img,draw, finger,thresh = 0.1):
-    thumb_x = finger.x
-    thumb_y = finger.y
+# def ContactCheck(img,draw, finger):
+#     thumb_x = int(finger.x * 640)
+#     thumb_y = int(finger.y * 480)
+#     thumb_z = abs(finger.z)
 
+#     x1 = int(draw[0][0]) 
+#     y1 = int(draw[0][1])
+#     x2 = int(draw[1][0])
+#     y2 = int(draw[1][1])
 
-    x1 = draw[0][0]
-    y1 = draw[0][1]
-    x2 = draw[1][0]
-    y2 = draw[1][1]
+#     print(x1, y1, x2, y2)
+#     if abs((y2 - y1) * thumb_x - (x2 - x1) * thumb_y + x2 * y1 - y2 * x1) / ((y2 - y1) ** 2 + (x2 - x1) ** 2) <= thumb_z:
+#         cv2.putText(img, "Strummed", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+#     else:
+#         cv2.putText(img, "No Contact", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-    print(x1, y1, x2, y2)
-    if abs((y2 - y1) * thumb_x - (x2 - x1) * thumb_y + x2 * y1 - y2 * x1) / ((y2 - y1) ** 2 + (x2 - x1) ** 2) <= thresh:
-        cv2.putText(img, "Strummed", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-    else:
-        cv2.putText(img, "No Contact", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+def ContactCheck(img,draw, finger,log = False, accuracy = 10):
+    thumb_x = int(finger.x * 640)
+    thumb_y = int(finger.y * 480)
+    thumb_z = abs(finger.z) / accuracy
+    for GuitarString in range(len(draw)):
+        x1 = int(draw[GuitarString][0][0])
+        y1 = int(draw[GuitarString][0][1])
+        x2 = int(draw[GuitarString][1][0])
+        y2 = int(draw[GuitarString][1][1])
 
+        if log:
+            print("String {} => Start {} --> End {}".format(GuitarString, draw[GuitarString][0], draw[GuitarString][1]))
+                  
+        if abs((y2 - y1) * thumb_x - (x2 - x1) * thumb_y + x2 * y1 - y2 * x1) / ((y2 - y1) ** 2 + (x2 - x1) ** 2) <= thumb_z:
+            cv2.putText(img, "Strummed String {}".format(GuitarString), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        else:
+            cv2.putText(img, "No Contact", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
   
 # ------------------------------------------------------------------------------------------------
 # for debugging
@@ -171,7 +188,7 @@ def DrawBoardLog(draw):
         print("Line {} => Start {} --> End {}".format(i, draw[i][0], draw[i][1]))
 
 def FingerLog(point,finger):
-    print("Finger {} => x: {} y: {}".format(finger,point[finger].x, point[finger].y))
+    print("Finger {} => x: {} y: {} z: {}".format(finger,point[finger].x, point[finger].y,point[finger].z))
 
 
 # ------------------------------------------------------------------------------------------------
@@ -211,32 +228,36 @@ def main():
             markHands(image, results, point,mp_drawing,mp_drawing_styles,mp_hands)
     
             # draw = DrawBoard(image, point ,lines=1)
-
+            draw = DrawBoard(image, point ,lines=3)
             # DrawBoardLog(draw)
+            ContactCheck(image,draw, point["Thumb Tip"])
 
-            thumb_x = int(point["Thumb Tip"].x * 640)
-            thumb_y = int(point["Thumb Tip"].y * 480)
+            # thumb_x = int(point["Thumb Tip"].x * 640)
+            # thumb_y = int(point["Thumb Tip"].y * 480)
             # x1 = draw[0][0][0]
             # y1 = draw[0][0][1]
             # x2 = draw[0][1][0]
             # y2 = draw[0][1][1]
 
-            x1 = point["Wrist"].x
-            y1 = point["Wrist"].y
+            # x1 = point["Wrist"].x
+            # y1 = point["Wrist"].y
 
-            x1 = int(x1*640)
-            y1 = int(y1*480)
-            x2 = 600
-            y2 = 20
+            # x1 = int(x1*640)
+            # y1 = int(y1*480)
+            # x2 = 600
+            # y2 = 20
 
-            cv2.line(image,(x1,y1),(x2,y2),(0,0,255),2)
-            # cv2.line(image, (int(x1) * 640, int(y1) * 480), (int(x2) * 640, int(y2) * 480), (0, 0, 255), 2)
-            if abs((y2 - y1) * thumb_x - (x2 - x1) * thumb_y + x2 * y1 - y2 * x1) / ((y2 - y1) ** 2 + (x2 - x1) ** 2) <= 0.1:
-                cv2.putText(image, "Strummed", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            else:
-                cv2.putText(image, "No Contact", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            # cv2.line(image,(x1,y1),(x2,y2),(0,0,255),2)
+            # # cv2.line(image, (int(x1) * 640, int(y1) * 480), (int(x2) * 640, int(y2) * 480), (0, 0, 255), 2)
+            # # FingerLog(point,"Thumb Tip")
+            # val = point["Thumb Tip"].z
+            # # make val always positive
+            # val = abs(val)
+            # if abs((y2 - y1) * thumb_x - (x2 - x1) * thumb_y + x2 * y1 - y2 * x1) / ((y2 - y1) ** 2 + (x2 - x1) ** 2) <= val:
+            #     cv2.putText(image, "Strummed", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            # else:
+            #     cv2.putText(image, "No Contact", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-            # ContactCheck(image,draw[0], point["Thumb Tip"],thresh = 0.5)
             # DrawLine(image, point["Wrist"], point["Middle MCP"], length=4, xoffset=0, yoffset= 0, Lncolor=(255,0,0), Hand = True, OneHand = True)
 
         showImage(image)
