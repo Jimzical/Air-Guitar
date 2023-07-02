@@ -1,0 +1,35 @@
+okay so
+
+
+- strum action
+    - two ways to strum
+        - one is to have pixel percentage of the guitar change significantly 
+            - the other optimization to get distance from the center of the guitar and have the pixel percentage change based on that
+        - the other is to use mediapipe or something to get the distance between thumb and index finger and have the pixel percentage change based on that
+
+- fret action
+    - few ways to fret
+        - identify fingers very accurately and make 16 sounds 
+            - not sure how but is a good idea
+        - identify the index finger only and get distance between both hands
+            - good way but need to identify dunno how
+            = also
+                - have a wave to get multiple fingers so different sounds based on how many fingers are down
+                    - good but not sure how to get the wave 
+        
+        - identiy the frets and have the pixel percentage change based on that (bad because it's hard to identify the frets)
+        - identify the fingers and have the pixel percentage change based on that
+            - tough to get acurate finger detection and only 4 sounds so it's not worth it
+        
+- sound action
+    - use multiple sound clips with multiple combinations of sounds
+        - q: how many chords on guitar
+        - a: 4
+        - q: waht are they
+        - a: e, a, d, g
+
+        - create a code to have smooth transformations
+            - complex 
+    - use the fibbonaci bullshit to create custom waveforms dynamically 
+        - light weight
+        - 
